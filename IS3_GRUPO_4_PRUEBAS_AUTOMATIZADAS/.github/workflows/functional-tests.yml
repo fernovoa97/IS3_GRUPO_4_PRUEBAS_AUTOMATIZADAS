@@ -1,0 +1,46 @@
+# .github/workflows/functional-tests.yml
+name: Pruebas Funcionales Automatizadas
+ 
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+ 
+jobs:
+  functional-tests:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+ 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+ 
+      - name: Instalar dependencias
+        run: npm ci
+ 
+      - name: Esperar que Render esté disponible
+        run: npx wait-on ${{ secrets.BASE_URL }}/api/auth/login --timeout 120000 --interval 5000
+ 
+      - name: Ejecutar pruebas funcionales
+        run: npm test
+        env:
+          BASE_URL:       ${{ secrets.BASE_URL }}
+          ADMIN_EMAIL:    ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          PACIENTE_ID:    ${{ secrets.PACIENTE_ID }}
+          DOCTOR_ID:      ${{ secrets.DOCTOR_ID }}
+          CITA_ID:        ${{ secrets.CITA_ID }}
+ 
+      - name: Subir resultados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-results
+          path: jest-results/
+          retention-days: 15
