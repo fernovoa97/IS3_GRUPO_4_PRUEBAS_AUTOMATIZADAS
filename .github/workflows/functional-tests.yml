@@ -1,39 +1,35 @@
-# .github/workflows/functional-tests.yml
 name: Pruebas Funcionales Automatizadas
- 
+
 on:
   push:
     branches: [main, develop]
   pull_request:
     branches: [main]
- 
+
 jobs:
   functional-tests:
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
- 
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
- 
+
       - name: Instalar dependencias
         run: npm ci
- 
-      - name: Despertar Render (cold start)
-        run: |
-          echo "Despertando el servidor..."
-          curl -s https://sistema-hospitalario-4uh4.onrender.com/ || true
-          sleep 30
-          echo "Servidor listo"
 
-      - name: Esperar que Render esté disponible
-        run: npx wait-on ${{ secrets.BASE_URL }}/api/auth/login --timeout 180000 --interval 10000
-        
+      - name: Despertar Render
+        run: |
+          echo "Despertando servidor..."
+          curl -s https://sistema-hospitalario-4uh4.onrender.com/ || true
+          sleep 60
+          echo "Listo"
+
       - name: Ejecutar pruebas funcionales
         run: npm test
         env:
@@ -43,7 +39,7 @@ jobs:
           PACIENTE_ID:    ${{ secrets.PACIENTE_ID }}
           DOCTOR_ID:      ${{ secrets.DOCTOR_ID }}
           CITA_ID:        ${{ secrets.CITA_ID }}
- 
+
       - name: Subir resultados
         if: always()
         uses: actions/upload-artifact@v4
