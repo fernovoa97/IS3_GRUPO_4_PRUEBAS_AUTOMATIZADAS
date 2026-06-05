@@ -24,9 +24,16 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
  
+      - name: Despertar Render (cold start)
+        run: |
+          echo "Despertando el servidor..."
+          curl -s https://sistema-hospitalario-4uh4.onrender.com/ || true
+          sleep 30
+          echo "Servidor listo"
+
       - name: Esperar que Render esté disponible
-        run: npx wait-on ${{ secrets.BASE_URL }}/api/auth/login --timeout 120000 --interval 5000
- 
+        run: npx wait-on ${{ secrets.BASE_URL }}/api/auth/login --timeout 180000 --interval 10000
+        
       - name: Ejecutar pruebas funcionales
         run: npm test
         env:
