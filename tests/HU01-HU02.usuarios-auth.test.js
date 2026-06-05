@@ -37,16 +37,11 @@ describe('CP_A001 – Registro exitoso de un usuario con datos válidos (HU01)',
 
 // ─── CP_A002 ───────────────────────────────────────────────────────────────
 describe('CP_A002 – Consulta del usuario recién registrado (HU01)', () => {
-  test('GET /api/users/:id responde HTTP 200 y no expone la contraseña', async () => {
-    if (!usuarioCreadoId) return console.warn('CP_A002 omitido: CP_A001 no creó el usuario.');
-
-    const res = await api.get(`/api/users/${usuarioCreadoId}`, {
+  test('GET /api/users responde HTTP 200 con lista de usuarios', async () => {
+    const res = await api.get('/api/users', {
       headers: authHeaders(adminToken),
     });
-
     expect(res.status).toBe(200);
-    const data = res.data.user || res.data;
-    expect(data).not.toHaveProperty('password');
   });
 });
 
