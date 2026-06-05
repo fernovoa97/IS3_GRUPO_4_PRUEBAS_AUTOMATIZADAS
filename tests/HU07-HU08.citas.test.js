@@ -30,7 +30,7 @@ describe('CP_A013 – Programación exitosa de una cita médica (HU07)', () => {
       appointmentDate: '2026-06-10T10:00:00',
       reason:          'Control general',
     }, { headers: authHeaders(token) });
-
+    console.log('CP_A013 error:', JSON.stringify(res.data));
     expect(res.status).toBe(201);
     const data = res.data.appointment || res.data;
     expect(data._id || data.id).toBeTruthy();

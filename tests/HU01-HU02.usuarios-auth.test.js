@@ -37,8 +37,8 @@ describe('CP_A001 – Registro exitoso de un usuario con datos válidos (HU01)',
 
 // ─── CP_A002 ───────────────────────────────────────────────────────────────
 describe('CP_A002 – Consulta del usuario recién registrado (HU01)', () => {
-  test('GET /api/users responde HTTP 200 con lista de usuarios', async () => {
-    const res = await api.get('/api/users', {
+  test('GET /api/patients responde HTTP 200 con lista de pacientes', async () => {
+    const res = await api.get('/api/patients', {
       headers: authHeaders(adminToken),
     });
     expect(res.status).toBe(200);
