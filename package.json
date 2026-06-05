@@ -7,12 +7,22 @@
     "test:verbose": "jest --runInBand --forceExit --verbose"
   },
   "devDependencies": {
+    "axios": "^1.6.0",
     "jest": "^29.7.0",
-    "axios": "^1.6.0"
+    "jest-html-reporter": "^4.4.0"
   },
   "jest": {
-    "testEnvironment": "node",
-    "testTimeout": 30000,
-    "testPathPattern": "tests/"
-  }
+  "testEnvironment": "node",
+  "testTimeout": 30000,
+  "testMatch": ["**/tests/**/*.test.js"],
+  "reporters": [
+    "default",
+    ["jest-html-reporter", {
+      "pageTitle": "Pruebas Funcionales - Sistema Hospitalario",
+      "outputPath": "jest-results/report.html",
+      "includeFailureMsg": true,
+      "includeSuiteFailure": true
+    }]
+  ]
+}
 }
