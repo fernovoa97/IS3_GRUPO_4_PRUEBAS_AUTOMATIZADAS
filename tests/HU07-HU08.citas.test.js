@@ -1,6 +1,7 @@
 // tests/HU07-HU08.citas.test.js
 // CP_A013 – CP_A016
-// Rutas reales: /api/appointments, PATCH /api/appointments/:id/status
+// Appointment: patient(ObjectId), doctor(ObjectId), appointmentDate, reason, status
+// status enum: pendiente, confirmada, completada, cancelada
 
 const { api, login, authHeaders } = require('./helpers');
 
@@ -18,39 +19,34 @@ beforeAll(async () => {
 
 // ─── CP_A013 ───────────────────────────────────────────────────────────────
 describe('CP_A013 – Programación exitosa de una cita médica (HU07)', () => {
-  test('POST /api/appointments responde HTTP 201 con estado Programada', async () => {
+  test('POST /api/appointments responde HTTP 201 con estado pendiente', async () => {
     if (!PACIENTE_ID || !DOCTOR_ID) {
-      return console.warn('CP_A013 omitido: define PACIENTE_ID y DOCTOR_ID en los secrets.');
+      return console.warn('CP_A013 omitido: define PACIENTE_ID y DOCTOR_ID en secrets.');
     }
 
     const res = await api.post('/api/appointments', {
-      paciente:    PACIENTE_ID,
-      paciente_id: PACIENTE_ID,
-      doctor:      DOCTOR_ID,
-      doctor_id:   DOCTOR_ID,
-      fecha:       '2026-06-10T10:00:00',
-      motivo:      'Control',
+      patient:         PACIENTE_ID,
+      doctor:          DOCTOR_ID,
+      appointmentDate: '2026-06-10T10:00:00',
+      reason:          'Control general',
     }, { headers: authHeaders(token) });
 
     expect(res.status).toBe(201);
     const data = res.data.appointment || res.data;
     expect(data._id || data.id).toBeTruthy();
-    // Estado inicial debe ser "Programada" o similar
-    const estado = (data.estado || data.status || '').toLowerCase();
-    expect(estado).toMatch(/programada|scheduled|pendiente/i);
+    expect(data.status).toMatch(/pendiente|confirmada/i);
     citaId = data._id || data.id;
   });
 });
 
 // ─── CP_A014 ───────────────────────────────────────────────────────────────
 describe('CP_A014 – Consulta de la cita en la agenda del doctor (HU07)', () => {
-  test('GET /api/appointments?doctor=&fecha= devuelve la cita programada', async () => {
+  test('GET /api/appointments?doctor= devuelve la cita programada', async () => {
     if (!citaId || !DOCTOR_ID) return console.warn('CP_A014 omitido: faltan datos.');
 
-    const res = await api.get(
-      `/api/appointments?doctor=${DOCTOR_ID}&fecha=2026-06-10`,
-      { headers: authHeaders(token) }
-    );
+    const res = await api.get(`/api/appointments?doctor=${DOCTOR_ID}`, {
+      headers: authHeaders(token),
+    });
 
     expect(res.status).toBe(200);
     const lista = Array.isArray(res.data) ? res.data
@@ -61,12 +57,12 @@ describe('CP_A014 – Consulta de la cita en la agenda del doctor (HU07)', () =>
 });
 
 // ─── CP_A015 ───────────────────────────────────────────────────────────────
-describe('CP_A015 – Actualización del estado de una cita a Atendida (HU08)', () => {
-  test('PATCH /api/appointments/:id/status responde HTTP 200 y la cita queda Atendida', async () => {
+describe('CP_A015 – Actualización del estado de una cita a completada (HU08)', () => {
+  test('PATCH /api/appointments/:id/status responde HTTP 200 y la cita queda completada', async () => {
     if (!citaId) return console.warn('CP_A015 omitido: no hay citaId.');
 
     const res = await api.patch(`/api/appointments/${citaId}/status`,
-      { estado: 'Atendida', status: 'Atendida' },
+      { status: 'completada' },
       { headers: authHeaders(token) }
     );
 
@@ -76,15 +72,14 @@ describe('CP_A015 – Actualización del estado de una cita a Atendida (HU08)', 
       headers: authHeaders(token),
     });
     const data = consulta.data.appointment || consulta.data;
-    const estado = (data.estado || data.status || '').toLowerCase();
-    expect(estado).toMatch(/atendida|attended|completed/i);
+    expect(data.status).toMatch(/completada/i);
   });
 });
 
 // ─── CP_A016 ───────────────────────────────────────────────────────────────
 describe('CP_A016 – Listado de citas filtrado por estado (HU08)', () => {
-  test('GET /api/appointments?estado=Atendida devuelve solo citas en ese estado', async () => {
-    const res = await api.get('/api/appointments?estado=Atendida', {
+  test('GET /api/appointments?status=completada devuelve solo citas completadas', async () => {
+    const res = await api.get('/api/appointments?status=completada', {
       headers: authHeaders(token),
     });
 
@@ -93,8 +88,7 @@ describe('CP_A016 – Listado de citas filtrado por estado (HU08)', () => {
       : res.data.appointments || res.data.data || [];
     expect(lista.length).toBeGreaterThan(0);
     lista.forEach(c => {
-      const estado = (c.estado || c.status || '').toLowerCase();
-      expect(estado).toMatch(/atendida|attended|completed/i);
+      expect(c.status).toMatch(/completada/i);
     });
   });
 });
