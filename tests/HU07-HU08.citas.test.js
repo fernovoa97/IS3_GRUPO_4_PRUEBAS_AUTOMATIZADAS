@@ -24,13 +24,19 @@ describe('CP_A013 – Programación exitosa de una cita médica (HU07)', () => {
       return console.warn('CP_A013 omitido: define PACIENTE_ID y DOCTOR_ID en secrets.');
     }
 
+    // Fecha futura única para evitar conflictos de horario en cada ejecución
+    const fecha = new Date();
+    fecha.setFullYear(fecha.getFullYear() + 2);
+    fecha.setHours(fecha.getHours() + (Date.now() % 1000));
+    fecha.setMinutes(0, 0, 0);
+
     const res = await api.post('/api/appointments', {
       patient:         PACIENTE_ID,
       doctor:          DOCTOR_ID,
-      appointmentDate: '2027-03-20T08:00:00',
+      appointmentDate: fecha.toISOString(),
       reason:          'Control general',
     }, { headers: authHeaders(token) });
-    
+
     expect(res.status).toBe(201);
     const data = res.data.appointment || res.data;
     expect(data._id || data.id).toBeTruthy();
@@ -38,7 +44,6 @@ describe('CP_A013 – Programación exitosa de una cita médica (HU07)', () => {
     citaId = data._id || data.id;
   });
 });
-
 // ─── CP_A014 ───────────────────────────────────────────────────────────────
 describe('CP_A014 – Consulta de la cita en la agenda del doctor (HU07)', () => {
   test('GET /api/appointments?doctor= devuelve la cita programada', async () => {
