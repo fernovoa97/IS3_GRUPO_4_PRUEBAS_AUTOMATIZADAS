@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Pruebas funcionales automatizadas – Sistema de Gestión Clínica (Equipo 3)",
   "scripts": {
-    "test": "jest --runInBand --forceExit",
-    "test:verbose": "jest --runInBand --forceExit --verbose"
-  },
+  "test": "jest --runInBand --forceExit --verbose",
+  "test:verbose": "jest --runInBand --forceExit --verbose"
+},
   "devDependencies": {
     "axios": "^1.6.0",
     "jest": "^29.7.0",
