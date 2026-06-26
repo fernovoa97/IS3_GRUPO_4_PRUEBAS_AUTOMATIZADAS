@@ -1,7 +1,7 @@
 {
   "name": "clinica-tests",
   "version": "1.0.0",
-  "description": "Pruebas funcionales automatizadas – Sistema de Gestión Clínica (Equipo 3)",
+  "description": "Pruebas funcionales automatizaadas – Sistema de Gestión Clínica (Equipo 3)",
   "scripts": {
   "test": "jest --runInBand --forceExit --verbose",
   "test:verbose": "jest --runInBand --forceExit --verbose"
